@@ -66,51 +66,51 @@ public class FileUtils {
 
     /**
      * 存储卡获取 指定文件
+     *
      * @param context
      * @param extension
      * @return
      */
-    public static List<FileInfo> getSpecificTypeFiles(Context context, String[] extension){
+    public static List<FileInfo> getSpecificTypeFiles(Context context, String[] extension) {
         List<FileInfo> fileInfoList = new ArrayList<FileInfo>();
 
         //内存卡文件的Uri
-        Uri fileUri= MediaStore.Files.getContentUri("external");
+        Uri fileUri = MediaStore.Files.getContentUri("external");
         //筛选列，这里只筛选了：文件路径和含后缀的文件名
-        String[] projection=new String[]{
+        String[] projection = new String[]{
                 MediaStore.Files.FileColumns.DATA, MediaStore.Files.FileColumns.TITLE
         };
 
         //构造筛选条件语句
-        String selection="";
-        for(int i=0;i<extension.length;i++)
-        {
-            if(i!=0)
-            {
-                selection=selection+" OR ";
+        String selection = "";
+        for (int i = 0; i < extension.length; i++) {
+            if (i != 0) {
+                Log.e(TAG,"this is for test ,i think it never be excuter");
+                selection = selection + " OR ";
             }
-            selection=selection+ MediaStore.Files.FileColumns.DATA+" LIKE '%"+extension[i]+"'";
+            selection = selection + MediaStore.Files.FileColumns.DATA + " LIKE '%" + extension[i] + "'";
         }
         //按时间降序条件
         String sortOrder = MediaStore.Files.FileColumns.DATE_MODIFIED;
 
         Cursor cursor = context.getContentResolver().query(fileUri, projection, selection, null, sortOrder);
-        if(cursor != null){
-            while (cursor.moveToNext()){
-                try{
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                try {
                     String data = cursor.getString(0);
                     FileInfo fileInfo = new FileInfo();
                     fileInfo.setFilePath(data);
 
                     long size = 0;
-                    try{
+                    try {
                         File file = new File(data);
                         size = file.length();
                         fileInfo.setSize(size);
-                    }catch(Exception e){
+                    } catch (Exception e) {
 
                     }
                     fileInfoList.add(fileInfo);
-                }catch (Exception e){
+                } catch (Exception e) {
                     Log.i("FileUtils", "------>>>" + e.getMessage());
                 }
 
@@ -122,13 +122,14 @@ public class FileUtils {
 
     /**
      * 查找指定文件名的文件
+     *
      * @param context
      * @param fileName
      * @return
      */
-    public static FileInfo getFileInfo(Context context, String fileName){
+    public static FileInfo getFileInfo(Context context, String fileName) {
         List<FileInfo> fileInfoList = getSpecificTypeFiles(context, new String[]{fileName});
-        if(fileInfoList == null && fileInfoList.size() == 0){
+        if (fileInfoList == null && fileInfoList.size() == 0) {
             return null;
         }
 
@@ -137,28 +138,29 @@ public class FileUtils {
 
     /**
      * 转化完整信息的FileInfo
+     *
      * @param context
      * @param fileInfoList
      * @param type
      * @return
      */
-    public static List<FileInfo> getDetailFileInfos(Context context, List<FileInfo> fileInfoList, int type){
+    public static List<FileInfo> getDetailFileInfos(Context context, List<FileInfo> fileInfoList, int type) {
 
-        if(fileInfoList == null || fileInfoList.size() <= 0){
+        if (fileInfoList == null || fileInfoList.size() <= 0) {
             return fileInfoList;
         }
 
-        for(FileInfo fileInfo : fileInfoList){
-            if(fileInfo != null){
+        for (FileInfo fileInfo : fileInfoList) {
+            if (fileInfo != null) {
                 fileInfo.setName(getFileName(fileInfo.getFilePath()));
                 fileInfo.setSizeDesc(getFileSize(fileInfo.getSize()));
-                if(type == FileInfo.TYPE_APK){
+                if (type == FileInfo.TYPE_APK) {
                     fileInfo.setBitmap(FileUtils.drawableToBitmap(FileUtils.getApkThumbnail(context, fileInfo.getFilePath())));
-                }else if(type == FileInfo.TYPE_MP4){
+                } else if (type == FileInfo.TYPE_MP4) {
                     fileInfo.setBitmap(FileUtils.getScreenshotBitmap(context, fileInfo.getFilePath(), FileInfo.TYPE_MP4));
-                }else if(type == FileInfo.TYPE_MP3){ //mp3不需要缩略图
+                } else if (type == FileInfo.TYPE_MP3) { //mp3不需要缩略图
 
-                }else if(type == FileInfo.TYPE_JPG){//由Glide图片加载框架加载
+                } else if (type == FileInfo.TYPE_JPG) {//由Glide图片加载框架加载
 
                 }
                 fileInfo.setFileType(type);
@@ -174,18 +176,19 @@ public class FileUtils {
      * @param filePath
      * @return
      */
-    public static String getFileName(String filePath){
-        if(filePath == null || filePath.equals("")) return "";
+    public static String getFileName(String filePath) {
+        if (filePath == null || filePath.equals("")) return "";
         return filePath.substring(filePath.lastIndexOf("/") + 1);
     }
 
     /**
      * 获取文件的根目录
+     *
      * @return
      */
-    public static String getRootDirPath(){
+    public static String getRootDirPath() {
         String path = DEFAULT_ROOT_PATH;
-        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             path = Environment.getExternalStorageDirectory() + "/kuaichuan/";
         }
         return path;
@@ -193,11 +196,12 @@ public class FileUtils {
 
     /**
      * 获取文件缩略图目录
+     *
      * @return
      */
-    public static String getScreenShotDirPath(){
+    public static String getScreenShotDirPath() {
         String path = DEFAULT_SCREENSHOT_PATH;
-        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             path = Environment.getExternalStorageDirectory() + "/kc_screenshot/";
         }
         return path;
@@ -205,26 +209,27 @@ public class FileUtils {
 
     /**
      * 获取指定的文件夹路径
+     *
      * @param type @@See FileInfo.java
      * @return
      */
-    public static String getSpecifyDirPath(int type){
+    public static String getSpecifyDirPath(int type) {
         String dirPath = getRootDirPath();
 
-        switch (type){
-            case FileInfo.TYPE_APK:{
+        switch (type) {
+            case FileInfo.TYPE_APK: {
                 dirPath = dirPath + "apk/";
                 break;
             }
-            case FileInfo.TYPE_JPG:{
+            case FileInfo.TYPE_JPG: {
                 dirPath = dirPath + "jpg/";
                 break;
             }
-            case FileInfo.TYPE_MP3:{
+            case FileInfo.TYPE_MP3: {
                 dirPath = dirPath + "mp3/";
                 break;
             }
-            case FileInfo.TYPE_MP4:{
+            case FileInfo.TYPE_MP4: {
                 dirPath = dirPath + "mp4/";
                 break;
             }
@@ -242,27 +247,27 @@ public class FileUtils {
      * @param url
      * @return
      */
-    public static  File gerateLocalFile(String url){
+    public static File gerateLocalFile(String url) {
         String fileName = getFileName(url);
 
-        String dirPath =  getRootDirPath();
+        String dirPath = getRootDirPath();
 
-        if(fileName.lastIndexOf(FileInfo.EXTEND_APK) > 0){
+        if (fileName.lastIndexOf(FileInfo.EXTEND_APK) > 0) {
             dirPath = getSpecifyDirPath(FileInfo.TYPE_APK);
-        }else if(fileName.lastIndexOf(FileInfo.EXTEND_JPG) > 0){
+        } else if (fileName.lastIndexOf(FileInfo.EXTEND_JPG) > 0) {
             dirPath = getSpecifyDirPath(FileInfo.TYPE_JPG);
-        }else if(fileName.lastIndexOf(FileInfo.EXTEND_MP3) > 0){
+        } else if (fileName.lastIndexOf(FileInfo.EXTEND_MP3) > 0) {
             dirPath = getSpecifyDirPath(FileInfo.TYPE_MP3);
-        }else if(fileName.lastIndexOf(FileInfo.EXTEND_MP4) > 0){
+        } else if (fileName.lastIndexOf(FileInfo.EXTEND_MP4) > 0) {
             dirPath = getSpecifyDirPath(FileInfo.TYPE_MP4);
-        }else{
+        } else {
             dirPath = getSpecifyDirPath(-1);
         }
 
 //        String dirPath =  Environment.getExternalStorageDirectory() + "/kuaichuan/";
 
         File dirFile = new File(dirPath);
-        if(!dirFile.exists()){
+        if (!dirFile.exists()) {
             dirFile.mkdirs();
         }
         File file = new File(dirFile, fileName);
@@ -277,24 +282,24 @@ public class FileUtils {
      * @param size byte数量
      * @return
      */
-    public static String getFileSize(long size){
-        if(size < 0){ //小于0字节则返回0
+    public static String getFileSize(long size) {
+        if (size < 0) { //小于0字节则返回0
             return "0B";
         }
 
         double value = 0f;
-        if((size / 1024) < 1){ //0 ` 1024 byte
-            return  size + "B";
-        }else if((size / (1024 * 1024)) < 1){//0 ` 1024 kbyte
+        if ((size / 1024) < 1) { //0 ` 1024 byte
+            return size + "B";
+        } else if ((size / (1024 * 1024)) < 1) {//0 ` 1024 kbyte
 
             value = size / 1024f;
-            return  FORMAT.format(value) + "KB";
-        }else if(size / (1024 * 1024 * 1024) < 1){                  //0 ` 1024 mbyte
-            value = (size*100 / (1024 * 1024)) / 100f ;
-            return  FORMAT.format(value) + "MB";
-        }else {                  //0 ` 1024 mbyte
-            value = (size * 100l / (1024l * 1024l  * 1024l) ) / 100f ;
-            return  FORMAT.format(value) + "GB";
+            return FORMAT.format(value) + "KB";
+        } else if (size / (1024 * 1024 * 1024) < 1) {                  //0 ` 1024 mbyte
+            value = (size * 100 / (1024 * 1024)) / 100f;
+            return FORMAT.format(value) + "MB";
+        } else {                  //0 ` 1024 mbyte
+            value = (size * 100l / (1024l * 1024l * 1024l)) / 100f;
+            return FORMAT.format(value) + "GB";
         }
     }
 
@@ -303,35 +308,36 @@ public class FileUtils {
      * 转换为流量数组
      * String[0] 为数值
      * String[1] 为单位
-     *  1024 ===》》》 1 k
+     * 1024 ===》》》 1 k
+     *
      * @param size
      * @return
      */
-    public static String[] getFileSizeArrayStr(long size){
+    public static String[] getFileSizeArrayStr(long size) {
         String[] result = new String[2];
-        if(size < 0){ //小于0字节则返回0
+        if (size < 0) { //小于0字节则返回0
             result[0] = "0";
             result[1] = "B";
             return result;
         }
 
         double value = 0f;
-        if((size / 1024) < 1){ //0 ` 1024 byte
+        if ((size / 1024) < 1) { //0 ` 1024 byte
             result[0] = FORMAT_ONE.format(size);
             result[1] = "B";
 //            return  size + "B";
-        }else if((size / (1024 * 1024)) < 1){//0 ` 1024 kbyte
+        } else if ((size / (1024 * 1024)) < 1) {//0 ` 1024 kbyte
             value = size / 1024f;
             result[0] = FORMAT_ONE.format(value);
             result[1] = "KB";
 //            return  FORMAT.format(value) + "KB";
-        }else if(size / (1024 * 1024 * 1024) < 1){                  //0 ` 1024 mbyte
-            value = (size*100 / (1024 * 1024)) / 100f ;
+        } else if (size / (1024 * 1024 * 1024) < 1) {                  //0 ` 1024 mbyte
+            value = (size * 100 / (1024 * 1024)) / 100f;
             result[0] = FORMAT_ONE.format(value);
             result[1] = "MB";
 //            return  FORMAT.format(value) + "MB";
-        }else {                  //0 ` 1024 mbyte
-            value = (size * 100l / (1024l * 1024l  * 1024l) ) / 100f ;
+        } else {                  //0 ` 1024 mbyte
+            value = (size * 100l / (1024l * 1024l * 1024l)) / 100f;
             result[0] = FORMAT_ONE.format(value);
             result[1] = "GB";
 //            return  FORMAT.format(value) + "GB";
@@ -344,29 +350,30 @@ public class FileUtils {
      * 转换为时间数组
      * String[0] 为数值
      * String[1] 为单位
-     *  61 ===》》》 1.05秒
+     * 61 ===》》》 1.05秒
+     *
      * @param second
      * @return
      */
-    public static String[] getTimeByArrayStr(long second){
+    public static String[] getTimeByArrayStr(long second) {
         String[] result = new String[2];
-        if(second < 0){ //小于0字节则返回0
+        if (second < 0) { //小于0字节则返回0
             result[0] = "0";
             result[1] = "秒";
             return result;
         }
 
         double value = 0.0f;
-        if(second / (60f * 1000f) < 1){ //秒
+        if (second / (60f * 1000f) < 1) { //秒
             result[0] = String.valueOf(second / 1000);
             result[1] = "秒";
 //            return  size + "B";
-        }else if((second / (60f * 60f * 1000f)) < 1){//分
+        } else if ((second / (60f * 60f * 1000f)) < 1) {//分
             value = second / (60f * 1000f);
             result[0] = FORMAT_ONE.format(value);
             result[1] = "分";
 //            return  FORMAT.format(value) + "KB";
-        }else{                              //时
+        } else {                              //时
             value = second / (60f * 60f * 1000f);
             result[0] = FORMAT_ONE.format(value);
             result[1] = "时";
@@ -376,17 +383,17 @@ public class FileUtils {
     }
 
 
-
     /**
      * 判断文件是否为Apk安装文件
+     *
      * @param filePath
      * @return
      */
-    public static boolean isApkFile(String filePath){
-        if(filePath == null || filePath.equals("")){
+    public static boolean isApkFile(String filePath) {
+        if (filePath == null || filePath.equals("")) {
             return false;
         }
-        if(filePath.lastIndexOf(FileInfo.EXTEND_APK) > 0){
+        if (filePath.lastIndexOf(FileInfo.EXTEND_APK) > 0) {
             return true;
         }
         return false;
@@ -394,14 +401,15 @@ public class FileUtils {
 
     /**
      * 判断文件是否为图片
+     *
      * @param filePath
      * @return
      */
-    public static boolean isJpgFile(String filePath){
-        if(filePath == null || filePath.equals("")){
+    public static boolean isJpgFile(String filePath) {
+        if (filePath == null || filePath.equals("")) {
             return false;
         }
-        if(filePath.lastIndexOf(FileInfo.EXTEND_JPG) > 0 || filePath.lastIndexOf(FileInfo.EXTEND_JPEG) > 0){
+        if (filePath.lastIndexOf(FileInfo.EXTEND_JPG) > 0 || filePath.lastIndexOf(FileInfo.EXTEND_JPEG) > 0) {
             return true;
         }
         return false;
@@ -409,14 +417,15 @@ public class FileUtils {
 
     /**
      * 判断文件是否为PNG
+     *
      * @param filePath
      * @return
      */
-    public static boolean isPngFile(String filePath){
-        if(filePath == null || filePath.equals("")){
+    public static boolean isPngFile(String filePath) {
+        if (filePath == null || filePath.equals("")) {
             return false;
         }
-        if(filePath.lastIndexOf(FileInfo.EXTEND_PNG) > 0 ){
+        if (filePath.lastIndexOf(FileInfo.EXTEND_PNG) > 0) {
             return true;
         }
         return false;
@@ -424,14 +433,15 @@ public class FileUtils {
 
     /**
      * 判断文件是否为Mp3
+     *
      * @param filePath
      * @return
      */
-    public static boolean isMp3File(String filePath){
-        if(filePath == null || filePath.equals("")){
+    public static boolean isMp3File(String filePath) {
+        if (filePath == null || filePath.equals("")) {
             return false;
         }
-        if(filePath.lastIndexOf(FileInfo.EXTEND_MP3) > 0){
+        if (filePath.lastIndexOf(FileInfo.EXTEND_MP3) > 0) {
             return true;
         }
         return false;
@@ -439,14 +449,15 @@ public class FileUtils {
 
     /**
      * 判断文件是否为Mp4
+     *
      * @param filePath
      * @return
      */
-    public static boolean isMp4File(String filePath){
-        if(filePath == null || filePath.equals("")){
+    public static boolean isMp4File(String filePath) {
+        if (filePath == null || filePath.equals("")) {
             return false;
         }
-        if(filePath.lastIndexOf(FileInfo.EXTEND_MP4) > 0){
+        if (filePath.lastIndexOf(FileInfo.EXTEND_MP4) > 0) {
             return true;
         }
         return false;
@@ -459,20 +470,20 @@ public class FileUtils {
      * @param type
      * @return
      */
-    public static Bitmap getScreenshotBitmap(Context context, String filePath, int type){
+    public static Bitmap getScreenshotBitmap(Context context, String filePath, int type) {
         Bitmap bitmap = null;
-        switch (type){
-            case TYPE_APK:{
+        switch (type) {
+            case TYPE_APK: {
                 Drawable drawable = getApkThumbnail(context, filePath);
-                if(drawable != null){
+                if (drawable != null) {
                     bitmap = drawableToBitmap(drawable);
-                }else{
+                } else {
 //                    bitmap = drawableToBitmap()
                     bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
                 }
                 break;
             }
-            case TYPE_JPEG:{
+            case TYPE_JPEG: {
                 try {
                     bitmap = BitmapFactory.decodeStream(new FileInputStream(new File(filePath)));
                 } catch (FileNotFoundException e) {
@@ -481,7 +492,7 @@ public class FileUtils {
                 bitmap = ScreenshotUtils.extractThumbnail(bitmap, 100, 100);
                 break;
             }
-            case TYPE_MP3:{
+            case TYPE_MP3: {
                 /*
                 try {
                     bitmap = BitmapFactory.decodeStream(new FileInputStream(new File(filePath)));
@@ -493,7 +504,7 @@ public class FileUtils {
                 bitmap = ScreenshotUtils.extractThumbnail(bitmap, 100, 100);
                 break;
             }
-            case TYPE_MP4:{
+            case TYPE_MP4: {
                 try {
                     bitmap = ScreenshotUtils.createVideoThumbnail(filePath);
                 } catch (Exception e) {
@@ -509,27 +520,28 @@ public class FileUtils {
 
     /**
      * 获取Apk文件的Log图标
+     *
      * @param context
      * @param apk_path
      * @return
      */
-    public static Drawable getApkThumbnail(Context context, String apk_path){
-        if(context == null){
+    public static Drawable getApkThumbnail(Context context, String apk_path) {
+        if (context == null) {
             return null;
         }
 
-        try{
+        try {
             PackageManager pm = context.getPackageManager();
             PackageInfo packageInfo = pm.getPackageArchiveInfo(apk_path, PackageManager.GET_ACTIVITIES);
             ApplicationInfo appInfo = packageInfo.applicationInfo;
             /**获取apk的图标 */
             appInfo.sourceDir = apk_path;
             appInfo.publicSourceDir = apk_path;
-            if(appInfo != null){
+            if (appInfo != null) {
                 Drawable apk_icon = appInfo.loadIcon(pm);
                 return apk_icon;
             }
-        }catch(Exception e){
+        } catch (Exception e) {
 
         }
 
@@ -537,9 +549,9 @@ public class FileUtils {
     }
 
     /**
-     * @Description 获取专辑封面
      * @param filePath 文件路径，like XXX/XXX/XX.mp3
      * @return 专辑封面bitmap
+     * @Description 获取专辑封面
      */
     public static Bitmap createAlbumArt(final String filePath) {
         Bitmap bitmap = null;
@@ -569,15 +581,14 @@ public class FileUtils {
     //4.Bitmap   --->>> 生成图片
 
 
-
     /**
      * Drawable转Bitmap
      *
      * @param drawable
      * @return
      */
-    public static Bitmap drawableToBitmap(Drawable drawable){
-        if(drawable == null){
+    public static Bitmap drawableToBitmap(Drawable drawable) {
+        if (drawable == null) {
             return null;
         }
 
@@ -605,8 +616,8 @@ public class FileUtils {
      * @param bitmap
      * @return
      */
-    public static byte[] bitmapToByteArray(Bitmap bitmap){
-        if(bitmap == null){
+    public static byte[] bitmapToByteArray(Bitmap bitmap) {
+        if (bitmap == null) {
             return null;
         }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -621,8 +632,8 @@ public class FileUtils {
      * @param resPath
      * @return
      */
-    public static boolean bitmapToSDCard(Bitmap bitmap, String resPath){
-        if(bitmap == null){
+    public static boolean bitmapToSDCard(Bitmap bitmap, String resPath) {
+        if (bitmap == null) {
             return false;
         }
         File resFile = new File(resPath);
@@ -671,7 +682,7 @@ public class FileUtils {
      *
      * @param srcBitmap
      * @param maxKByteCount 最大千字节数（比方说图片要压缩成32K，则传32）
-     * @param targetPath	目标图片地址
+     * @param targetPath    目标图片地址
      * @throws IOException
      */
     public static boolean compressBitmap(Bitmap srcBitmap, int maxKByteCount, String targetPath) {
@@ -689,7 +700,7 @@ public class FileUtils {
             byte[] bitmapByte = baos.toByteArray();
 
             File targetFile = new File(targetPath);
-            if(!targetFile.exists()){
+            if (!targetFile.exists()) {
                 targetFile.createNewFile();
             }
 
@@ -720,12 +731,13 @@ public class FileUtils {
 
     /**
      * 获取接收到文件数量
+     *
      * @return
      */
-    public static int getReceiveFileCount(){
+    public static int getReceiveFileCount() {
         int count = 0;
         File rootDir = new File(getRootDirPath());
-        if(rootDir != null){
+        if (rootDir != null) {
             count = getFileCount(rootDir);
         }
         return count;
@@ -733,17 +745,18 @@ public class FileUtils {
 
     /**
      * 获取指定文件夹下面的文件数
+     *
      * @param rootDir
      * @return
      */
-    public static int getFileCount(File rootDir){
+    public static int getFileCount(File rootDir) {
         int count = 0;
-        if(rootDir != null && rootDir.exists()){
-            for(File file : rootDir.listFiles()){
-                if(file.isDirectory()){
+        if (rootDir != null && rootDir.exists()) {
+            for (File file : rootDir.listFiles()) {
+                if (file.isDirectory()) {
                     count = count + getFileCount(file);
-                }else{
-                    count ++;
+                } else {
+                    count++;
                 }
             }
         }
@@ -751,15 +764,15 @@ public class FileUtils {
     }
 
 
-
     /**
      * 获取接收到全部的文件大小
+     *
      * @return
      */
-    public static String getReceiveFileListTotalLength(){
+    public static String getReceiveFileListTotalLength() {
         long total = 0;
         File rootDir = new File(getRootDirPath());
-        if(rootDir != null){
+        if (rootDir != null) {
             total = getFileLength(rootDir);
         }
         return getFileSize(total);
@@ -767,16 +780,17 @@ public class FileUtils {
 
     /**
      * 递归获取指定文件夹的大小
+     *
      * @param rootDir
      * @return
      */
-    public static long getFileLength(File rootDir){
+    public static long getFileLength(File rootDir) {
         long len = 0;
-        if(rootDir != null && rootDir.exists()){
-            for(File  f : rootDir.listFiles()){
-                if(f.isDirectory()){
+        if (rootDir != null && rootDir.exists()) {
+            for (File f : rootDir.listFiles()) {
+                if (f.isDirectory()) {
                     len = len + getFileLength(f);
-                }else{
+                } else {
                     len = len + f.length();
                 }
             }
@@ -786,20 +800,21 @@ public class FileUtils {
 
     /**
      * 打开文件
+     *
      * @param context
      * @param filePath
      */
-    public static void openFile(Context context, String filePath){
+    public static void openFile(Context context, String filePath) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
 //        Uri uri = Uri.parse(filePath);
         Uri uri = Uri.fromFile(new File(filePath));
-        if(FileUtils.isJpgFile(filePath)){//图片格式
+        if (FileUtils.isJpgFile(filePath)) {//图片格式
 //            "image/*"
             intent.setDataAndType(uri, "image/*");
-        }else if(FileUtils.isMp3File(filePath)){//音乐格式
+        } else if (FileUtils.isMp3File(filePath)) {//音乐格式
 //            "audio/*"
             intent.setDataAndType(uri, "audio/*");
-        } else if(FileUtils.isMp4File(filePath)){//视屏格式
+        } else if (FileUtils.isMp4File(filePath)) {//视屏格式
 //            "video/*"
             intent.setDataAndType(uri, "video/*");
         }
@@ -809,18 +824,19 @@ public class FileUtils {
 
     /**
      * 远程的FilePath获取本地的FilePath
+     *
      * @param remoteFilePath
      * @return
      */
-    public static String getLocalFilePath(String remoteFilePath){
+    public static String getLocalFilePath(String remoteFilePath) {
         String localFilePath = "";
-        if(FileUtils.isApkFile(remoteFilePath)) {//APK应用格式
+        if (FileUtils.isApkFile(remoteFilePath)) {//APK应用格式
             localFilePath = getSpecifyDirPath(FileInfo.TYPE_APK) + getFileName(remoteFilePath);
-        }else if(FileUtils.isJpgFile(remoteFilePath)){//图片格式
+        } else if (FileUtils.isJpgFile(remoteFilePath)) {//图片格式
             localFilePath = getSpecifyDirPath(FileInfo.TYPE_JPG) + getFileName(remoteFilePath);
-        }else if(FileUtils.isMp3File(remoteFilePath)){//音乐格式
+        } else if (FileUtils.isMp3File(remoteFilePath)) {//音乐格式
             localFilePath = getSpecifyDirPath(FileInfo.TYPE_MP3) + getFileName(remoteFilePath);
-        } else if(FileUtils.isMp4File(remoteFilePath)){//视屏格式
+        } else if (FileUtils.isMp4File(remoteFilePath)) {//视屏格式
             localFilePath = getSpecifyDirPath(FileInfo.TYPE_MP4) + getFileName(remoteFilePath);
         }
         return localFilePath;
@@ -829,12 +845,13 @@ public class FileUtils {
 
     /**
      * 判断文件的缩略图是否存在
+     *
      * @param fileName
      * @return
      */
-    public static boolean isExistScreenShot(String fileName){
+    public static boolean isExistScreenShot(String fileName) {
         File file = new File(FileUtils.getScreenShotDirPath() + fileName);
-        if(file.exists()){
+        if (file.exists()) {
             return true;
         }
         return false;
@@ -842,14 +859,15 @@ public class FileUtils {
 
     /**
      * 获取文件缩略图的路径
+     *
      * @param fileName
      * @return
      */
-    public static String getScreenShotFilePath(String fileName){
+    public static String getScreenShotFilePath(String fileName) {
         File dirFile = new File(FileUtils.getScreenShotDirPath());
-        if(!dirFile.exists()) dirFile.mkdirs();
+        if (!dirFile.exists()) dirFile.mkdirs();
 
-        if(isMp3File(fileName)){
+        if (isMp3File(fileName)) {
             return FileUtils.getScreenShotDirPath() + "mp3.png";
         }
         return FileUtils.getScreenShotDirPath() + fileName.replace(".", "_") + ".png";
@@ -858,6 +876,7 @@ public class FileUtils {
 
     /**
      * 自动生成缩略图
+     *
      * @param context
      * @param filePath
      * @return
@@ -870,26 +889,26 @@ public class FileUtils {
         FileOutputStream fos = null;
 
         //check the screenshot image file exist in disk? if exist return the file, or create the screen image file
-        if(FileUtils.isApkFile(filePath)){//apk 缩略图处理
-            if(!FileUtils.isExistScreenShot(fileName)){
+        if (FileUtils.isApkFile(filePath)) {//apk 缩略图处理
+            if (!FileUtils.isExistScreenShot(fileName)) {
                 screenshotFile = new File(getScreenShotFilePath(fileName));
-                if(!screenshotFile.exists()) screenshotFile.createNewFile();
+                if (!screenshotFile.exists()) screenshotFile.createNewFile();
                 fos = new FileOutputStream(screenshotFile);
                 screenshotBitmap = ApkUtils.drawableToBitmap(ApkUtils.getApkThumbnail(context, filePath));
                 screenshotBitmap = ScreenshotUtils.extractThumbnail(screenshotBitmap, 96, 96);
                 screenshotBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
             }
-        }else if(FileUtils.isJpgFile(filePath)){//jpg 缩略图处理
-            if(!FileUtils.isExistScreenShot(fileName)){
+        } else if (FileUtils.isJpgFile(filePath)) {//jpg 缩略图处理
+            if (!FileUtils.isExistScreenShot(fileName)) {
                 screenshotFile = new File(getScreenShotFilePath(fileName));
-                if(!screenshotFile.exists()) screenshotFile.createNewFile();
+                if (!screenshotFile.exists()) screenshotFile.createNewFile();
                 fos = new FileOutputStream(screenshotFile);
                 screenshotBitmap = FileUtils.getScreenshotBitmap(context, filePath, FileInfo.TYPE_JPG);
                 screenshotBitmap = ScreenshotUtils.extractThumbnail(screenshotBitmap, 96, 96);
                 screenshotBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
             }
 
-        }else if(FileUtils.isMp3File(filePath)){//mp3 缩略图处理
+        } else if (FileUtils.isMp3File(filePath)) {//mp3 缩略图处理
             //DO NOTHING mp3文件可以没有缩略图 可指定
             screenshotFile = new File(FileUtils.getScreenShotDirPath() + "mp3.png");
             if (!screenshotFile.exists()) screenshotFile.createNewFile();
@@ -897,16 +916,16 @@ public class FileUtils {
             screenshotBitmap = FileUtils.getScreenshotBitmap(context, filePath, FileInfo.TYPE_MP3);
             screenshotBitmap = ScreenshotUtils.extractThumbnail(screenshotBitmap, 96, 96);
             screenshotBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-        }else if(FileUtils.isMp4File(filePath)){//MP4 缩略图处理
-            if(!FileUtils.isExistScreenShot(fileName)){
+        } else if (FileUtils.isMp4File(filePath)) {//MP4 缩略图处理
+            if (!FileUtils.isExistScreenShot(fileName)) {
                 screenshotFile = new File(getScreenShotFilePath(fileName));
-                if(!screenshotFile.exists()) screenshotFile.createNewFile();
+                if (!screenshotFile.exists()) screenshotFile.createNewFile();
                 fos = new FileOutputStream(screenshotFile);
                 screenshotBitmap = FileUtils.getScreenshotBitmap(context, filePath, FileInfo.TYPE_MP4);
                 screenshotBitmap = ScreenshotUtils.extractThumbnail(screenshotBitmap, 96, 96);
                 screenshotBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
             }
-        }else if(FileUtils.isMp4File(filePath)) {//MP4 缩略图处理
+        } else if (FileUtils.isMp4File(filePath)) {//MP4 缩略图处理
             screenshotFile = new File(FileUtils.getScreenShotDirPath() + "logo.png");
             if (!screenshotFile.exists()) screenshotFile.createNewFile();
             fos = new FileOutputStream(screenshotFile);
@@ -915,26 +934,26 @@ public class FileUtils {
             screenshotBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
         }
 
-        if(screenshotBitmap != null){
+        if (screenshotBitmap != null) {
             screenshotBitmap.recycle();
         }
 
-        if(fos != null){
+        if (fos != null) {
             fos.close();
             fos = null;
         }
     }
 
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         System.out.println("Test getTimeByArrayStr(59 * 1000)----->>>" + getTimeByArrayStr(59 * 1000)[0]
-                                                                        + " , " + getTimeByArrayStr(59 * 1000)[1]);
+                + " , " + getTimeByArrayStr(59 * 1000)[1]);
 
         System.out.println("Test getTimeByArrayStr(59 * 1000)----->>>" + getTimeByArrayStr(59 * 1001)[0]
                 + " , " + getTimeByArrayStr(59 * 1001)[1]);
 
-        System.out.println("Test getTimeByArrayStr(59 * 1000)----->>>" + getTimeByArrayStr(59 * 1000*100)[0]
-                + " , " + getTimeByArrayStr(59 * 1000 *100)[1]);
+        System.out.println("Test getTimeByArrayStr(59 * 1000)----->>>" + getTimeByArrayStr(59 * 1000 * 100)[0]
+                + " , " + getTimeByArrayStr(59 * 1000 * 100)[1]);
     }
 
 }

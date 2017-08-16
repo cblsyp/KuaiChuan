@@ -9,7 +9,7 @@
     tools:context="io.github.mayubao.kuaichuan.ui.HomeActivity"
     tools:showIn="@layout/app_bar_home"
     android:layout_gravity="bottom">
-    
+
     <LinearLayout
         android:id="@+id/ll_main"
         android:layout_width="match_parent"

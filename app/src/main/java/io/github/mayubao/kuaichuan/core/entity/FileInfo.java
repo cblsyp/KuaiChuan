@@ -46,7 +46,7 @@ public class FileInfo implements Serializable{
     public static final int FLAG_FAILURE = -1;
 
     //必要属性
-    /**
+    /**f
      * 文件路径
      */
     private String filePath;

@@ -156,7 +156,7 @@ public class HomeActivity extends BaseActivity
 
         //设置设备名称
         String device = TextUtils.isNullOrBlank(android.os.Build.DEVICE) ? Constant.DEFAULT_SSID : android.os.Build.DEVICE;
-        try{//设置左边抽屉的设备名称
+        try{//设置左边抽屉的设备名称c
             tv_name = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.tv_name);
             tv_name.setText(device);
         }catch(Exception e){

@@ -1,6 +1,7 @@
 package io.github.mayubao.kuaichuan.utils;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -11,6 +12,8 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import java.util.Arrays;
+
 /**
  * 动画的工具类
  *
@@ -18,7 +21,7 @@ import android.widget.LinearLayout;
  * Contact me 345269374@qq.com
  */
 public class AnimationUtils {
-
+private static final String TAG="chen debug";
     /**
      * 创建动画层
      * @param activity
@@ -55,6 +58,8 @@ public class AnimationUtils {
         int[] endLocArray = new int[2];
         startView.getLocationInWindow(startLocArray);
         targetView.getLocationInWindow(endLocArray);
+
+        Log.e(TAG,"start view's params:"+ Arrays.toString(startLocArray)+"\n"+"end view's params:"+Arrays.toString(endLocArray));
 
         //3.设置遮罩层ImageView的LayoutParams
         ViewGroup.LayoutParams startViewLayoutParams = startView.getLayoutParams();
