@@ -30,6 +30,7 @@ public class ApMgr {
         WifiManager wifimanager = (WifiManager) context.getSystemService(context.WIFI_SERVICE);
         try {
             Method method = wifimanager.getClass().getDeclaredMethod("isWifiApEnabled");
+            //打破封装  使用反射机制可以打破封装，导致java对象的属性不安全
             method.setAccessible(true);
             return (Boolean) method.invoke(wifimanager);
         }
